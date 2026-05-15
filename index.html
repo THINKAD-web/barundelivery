@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>바른운송 — 바르게, 조용히, 정확하게.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Noto+Serif+KR:wght@300;400;500;600&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          navy: {
+            950: '#020509',
+            900: '#0A0F1A',
+            800: '#111827',
+            700: '#1a2540',
+            600: '#243058',
+          },
+          gold: {
+            light: '#E8D5B0',
+            DEFAULT: '#C5A26F',
+            dark: '#9E7E4D',
+            deep: '#7A5E32',
+          }
+        },
+        fontFamily: {
+          display: ['"Cormorant Garamond"', 'serif'],
+          korean: ['"Noto Serif KR"', 'serif'],
+          body: ['"Noto Sans KR"', 'sans-serif'],
+        }
+      }
+    }
+  }
+</script>
+<style>
+  :root {
+    --navy-950: #020509;
+    --navy-900: #0A0F1A;
+    --navy-800: #111827;
+    --gold: #C5A26F;
+    --gold-light: #E8D5B0;
+    --gold-dark: #9E7E4D;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background-color: var(--navy-900);
+    color: #E8E0D4;
+    font-family: 'Noto Sans KR', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--navy-900); }
+  ::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 2px; }
+
+  /* ── GRAIN OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* ── GOLD LINE DIVIDER ── */
+  .gold-line {
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 0 auto;
+  }
+
+  .gold-line-left {
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(90deg, var(--gold), transparent);
+  }
+
+  /* ── SECTION FADE-IN ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1), transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  /* ── NAV ── */
+  #navbar {
+    transition: background 0.4s ease, backdrop-filter 0.4s ease, box-shadow 0.4s ease;
+  }
+  #navbar.scrolled {
+    background: rgba(10, 15, 26, 0.97) !important;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 1px 0 rgba(197, 162, 111, 0.15);
+  }
+
+  .nav-link {
+    position: relative;
+    color: rgba(232, 213, 176, 0.7);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: color 0.3s;
+    text-decoration: none;
+  }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--gold);
+    transition: width 0.35s ease;
+  }
+  .nav-link:hover { color: var(--gold-light); }
+  .nav-link:hover::after { width: 100%; }
+
+  .cta-btn {
+    display: inline-block;
+    padding: 10px 24px;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-family: 'Noto Sans KR', sans-serif;
+    text-decoration: none;
+    transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gold);
+    transform: translateX(-100%);
+    transition: transform 0.35s ease;
+    z-index: -1;
+  }
+  .cta-btn:hover { color: var(--navy-900); box-shadow: 0 0 30px rgba(197, 162, 111, 0.25); }
+  .cta-btn:hover::before { transform: translateX(0); }
+
+  /* ── HERO ── */
+  #hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    background: var(--navy-950);
+  }
+
+  .hero-bg-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(197, 162, 111, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(197, 162, 111, 0.04) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 40%, transparent 100%);
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(197, 162, 111, 0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* ── HERO IMAGES COLLAGE ── */
+  .hero-collage {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ── SERVICE CARDS ── */
+  .service-card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+    border: 1px solid rgba(197, 162, 111, 0.12);
+    transition: border-color 0.4s, transform 0.4s, box-shadow 0.4s;
+    position: relative;
+    overflow: hidden;
+  }
+  .service-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .service-card:hover {
+    border-color: rgba(197, 162, 111, 0.35);
+    transform: translateY(-6px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(197, 162, 111, 0.06);
+  }
+  .service-card:hover::before { opacity: 1; }
+
+  /* ── DIFFERENTIATOR ITEMS ── */
+  .diff-item {
+    border-left: 1px solid rgba(197, 162, 111, 0.2);
+    transition: border-color 0.3s;
+    padding-left: 28px;
+  }
+  .diff-item:hover { border-color: var(--gold); }
+
+  /* ── STEP INDICATOR ── */
+  .step-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 5rem;
+    line-height: 1;
+    font-weight: 300;
+    background: linear-gradient(180deg, rgba(197,162,111,0.5) 0%, rgba(197,162,111,0.05) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.02em;
+  }
+
+  /* ── FORM ── */
+  .form-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(197, 162, 111, 0.2);
+    color: #E8E0D4;
+    padding: 14px 18px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.85rem;
+    transition: border-color 0.3s, background 0.3s;
+    outline: none;
+  }
+  .form-input:focus {
+    border-color: var(--gold);
+    background: rgba(197, 162, 111, 0.04);
+  }
+  .form-input::placeholder { color: rgba(232, 213, 176, 0.3); }
+
+  .form-label {
+    display: block;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold) 50%, var(--gold-dark) 100%);
+    background-size: 200% auto;
+    color: var(--navy-900);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: background-position 0.5s, box-shadow 0.3s;
+  }
+  .submit-btn:hover {
+    background-position: right center;
+    box-shadow: 0 8px 30px rgba(197, 162, 111, 0.35);
+  }
+
+  /* ── PHONE CTA ── */
+  .phone-display {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 300;
+    color: var(--gold-light);
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    display: inline-block;
+    transition: color 0.3s;
+  }
+  .phone-display:hover { color: var(--gold); }
+
+  /* ── IMAGE GALLERY HOVER ── */
+  .gallery-img {
+    overflow: hidden;
+    position: relative;
+  }
+  .gallery-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1), filter 0.5s;
+    filter: saturate(0.85) brightness(0.9);
+  }
+  .gallery-img:hover img {
+    transform: scale(1.06);
+    filter: saturate(1) brightness(1);
+  }
+  .gallery-img::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 60%, rgba(10,15,26,0.6) 100%);
+    pointer-events: none;
+  }
+
+  /* ── BADGE ── */
+  .gold-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border: 1px solid rgba(197, 162, 111, 0.4);
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+
+  /* ── MOBILE MENU ── */
+  #mobile-menu {
+    transform: translateX(100%);
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  #mobile-menu.open { transform: translateX(0); }
+
+  /* ── ICON SVG ── */
+  .icon-gold { color: var(--gold); }
+
+  /* ── MARQUEE ── */
+  .marquee-track {
+    display: flex;
+    gap: 80px;
+    animation: marquee 20s linear infinite;
+    white-space: nowrap;
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* ── HERO TEXT ANIMATION ── */
+  .hero-title-line {
+    overflow: hidden;
+    display: block;
+  }
+  .hero-title-inner {
+    display: block;
+    transform: translateY(100%);
+    animation: slideUp 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  @keyframes slideUp {
+    to { transform: translateY(0); }
+  }
+  .delay-100 { animation-delay: 0.1s; }
+  .delay-200 { animation-delay: 0.2s; }
+  .delay-300 { animation-delay: 0.3s; }
+  .delay-500 { animation-delay: 0.5s; }
+  .delay-700 { animation-delay: 0.7s; }
+
+  /* ── CORNER DECORATION ── */
+  .corner-tl, .corner-tr, .corner-bl, .corner-br {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+  }
+  .corner-tl { top: 12px; left: 12px; border-top: 1px solid var(--gold); border-left: 1px solid var(--gold); }
+  .corner-tr { top: 12px; right: 12px; border-top: 1px solid var(--gold); border-right: 1px solid var(--gold); }
+  .corner-bl { bottom: 12px; left: 12px; border-bottom: 1px solid var(--gold); border-left: 1px solid var(--gold); }
+  .corner-br { bottom: 12px; right: 12px; border-bottom: 1px solid var(--gold); border-right: 1px solid var(--gold); }
+
+  /* ── SECTION HEADING ── */
+  .section-en {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3.5rem, 6vw, 5.5rem);
+    font-weight: 300;
+    line-height: 0.9;
+    color: rgba(197, 162, 111, 0.08);
+    letter-spacing: -0.02em;
+    position: absolute;
+    top: -10px;
+    left: 0;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  /* ── BG TEXTURE ── */
+  .section-alt {
+    background: linear-gradient(180deg, var(--navy-950) 0%, #070C17 50%, var(--navy-950) 100%);
+    position: relative;
+  }
+  .section-alt::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C5A26F' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  /* ── CONTACT BOX ── */
+  .contact-info-box {
+    background: linear-gradient(135deg, rgba(197,162,111,0.05) 0%, rgba(197,162,111,0.02) 100%);
+    border: 1px solid rgba(197, 162, 111, 0.15);
+    position: relative;
+  }
+
+  /* ── SUCCESS MESSAGE ── */
+  #form-success {
+    display: none;
+    background: rgba(197,162,111,0.1);
+    border: 1px solid rgba(197,162,111,0.3);
+    padding: 16px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--gold-light);
+  }
+
+  /* Responsive hero layout */
+  @media (max-width: 1024px) {
+    .hero-right { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     NAVIGATION
+═══════════════════════════════════════════ -->
+<nav id="navbar" class="fixed top-0 left-0 right-0 z-50 py-4 px-6 lg:px-12" style="background: transparent;">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+
+    <!-- Logo -->
+    <a href="#" class="flex items-center gap-3 flex-shrink-0">
+      <div class="w-10 h-10 overflow-hidden" style="border: 1px solid rgba(197,162,111,0.3);">
+        <img src="https://i.ibb.co/wrsskj2B/Kakao-Talk-Photo-2026-05-14-16-00-59-002.jpg" 
+             alt="바른운송 로고" class="w-full h-full object-cover">
+      </div>
+      <div>
+        <div style="font-family:'Noto Serif KR',serif; font-size:1rem; font-weight:500; color:#E8D5B0; letter-spacing:0.1em;">바른운송</div>
+        <div style="font-size:0.5rem; letter-spacing:0.25em; color:var(--gold); text-transform:uppercase; font-family:'Noto Sans KR',sans-serif;">Premium Delivery</div>
+      </div>
+    </a>
+
+    <!-- Desktop Menu -->
+    <div class="hidden lg:flex items-center gap-10">
+      <a href="#services" class="nav-link">서비스</a>
+      <a href="#why" class="nav-link">차별점</a>
+      <a href="#process" class="nav-link">이용방법</a>
+      <a href="#contact" class="nav-link">문의하기</a>
+    </div>
+
+    <!-- Right: Phone + CTA -->
+    <div class="hidden lg:flex items-center gap-6">
+      <a href="tel:01088247774" style="font-family:'Cormorant Garamond',serif; font-size:1.1rem; font-weight:400; color:var(--gold-light); letter-spacing:0.08em; text-decoration:none; transition:color 0.3s;" 
+         onmouseover="this.style.color='#C5A26F'" onmouseout="this.style.color='#E8D5B0'">
+        010-8824-7774
+      </a>
+      <a href="#contact" class="cta-btn">견적 문의</a>
+    </div>
+
+    <!-- Mobile Hamburger -->
+    <button id="hamburger" class="lg:hidden flex flex-col gap-1.5 p-2" onclick="toggleMenu()">
+      <span class="block w-6 h-px bg-gold-DEFAULT transition-transform" style="background:var(--gold);"></span>
+      <span class="block w-4 h-px transition-opacity" style="background:var(--gold);"></span>
+      <span class="block w-6 h-px transition-transform" style="background:var(--gold);"></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Menu Overlay -->
+<div id="mobile-menu" class="fixed inset-0 z-40 flex flex-col justify-center items-center" 
+     style="background:rgba(2,5,9,0.98); backdrop-filter:blur(20px);">
+  <button onclick="toggleMenu()" class="absolute top-6 right-6" style="color:var(--gold); font-size:1.5rem;">✕</button>
+  <div class="flex flex-col items-center gap-10">
+    <a href="#services" class="nav-link text-xl tracking-widest" onclick="toggleMenu()">서비스</a>
+    <a href="#why" class="nav-link text-xl tracking-widest" onclick="toggleMenu()">차별점</a>
+    <a href="#process" class="nav-link text-xl tracking-widest" onclick="toggleMenu()">이용방법</a>
+    <a href="#contact" class="nav-link text-xl tracking-widest" onclick="toggleMenu()">문의하기</a>
+    <div class="mt-4 text-center">
+      <a href="tel:01088247774" style="font-family:'Cormorant Garamond',serif; font-size:1.8rem; color:var(--gold-light); text-decoration:none; display:block; margin-bottom:16px;">010-8824-7774</a>
+      <a href="#contact" class="cta-btn" onclick="toggleMenu()">견적 문의하기</a>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     HERO
+═══════════════════════════════════════════ -->
+<section id="hero" class="relative">
+  <div class="hero-bg-grid"></div>
+  <div class="hero-glow" style="top:-100px; right:-100px;"></div>
+  <div class="hero-glow" style="bottom:-200px; left:-200px; opacity:0.6;"></div>
+
+  <div class="max-w-7xl mx-auto px-6 lg:px-12 w-full relative z-10">
+    <div class="grid lg:grid-cols-2 gap-12 items-center min-h-screen py-32">
+
+      <!-- Left: Text -->
+      <div>
+        <div class="gold-badge mb-8" style="animation: fadeIn 1s 0.3s both;">
+          <span style="width:20px;height:1px;background:var(--gold);display:inline-block;"></span>
+          White Glove Delivery
+          <span style="width:20px;height:1px;background:var(--gold);display:inline-block;"></span>
+        </div>
+
+        <h1 style="font-family:'Noto Serif KR',serif; font-weight:300; line-height:1.15; margin-bottom:32px;">
+          <span class="hero-title-line" style="display:block; font-size:clamp(2.8rem, 5vw, 4.5rem); color:#F0EAE0; letter-spacing:-0.01em;">
+            <span class="hero-title-inner" style="display:block; transform:translateY(100%); animation:slideUp 1s 0.2s cubic-bezier(0.22,1,0.36,1) forwards;">바르게,</span>
+          </span>
+          <span class="hero-title-line" style="display:block; font-size:clamp(2.8rem, 5vw, 4.5rem); color:#F0EAE0; letter-spacing:-0.01em;">
+            <span class="hero-title-inner delay-100" style="display:block; transform:translateY(100%); animation:slideUp 1s 0.35s cubic-bezier(0.22,1,0.36,1) forwards;">조용히,</span>
+          </span>
+          <span class="hero-title-line" style="display:block; font-size:clamp(2.8rem, 5vw, 4.5rem); letter-spacing:-0.01em;">
+            <span class="hero-title-inner delay-200" style="display:block; transform:translateY(100%); animation:slideUp 1s 0.5s cubic-bezier(0.22,1,0.36,1) forwards; background:linear-gradient(135deg,#C5A26F,#E8D5B0); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">정확하게.</span>
+          </span>
+        </h1>
+
+        <div style="width:40px; height:1px; background:var(--gold); margin-bottom:28px; animation:expandWidth 1s 0.8s both;" 
+             class="delay-500"></div>
+
+        <p class="hero-title-inner delay-500" style="display:block; transform:translateY(100%); animation:slideUp 1s 0.8s cubic-bezier(0.22,1,0.36,1) forwards; font-family:'Noto Sans KR',sans-serif; font-size:0.95rem; font-weight:300; color:rgba(232,213,176,0.7); line-height:2; margin-bottom:40px; max-width:440px;">
+          대형 가구, 명품 가전, 예술 작품까지.<br>
+          2인 1조 전문 배송팀이 실내 배치와 포장재 회수까지<br>
+          완벽하게 책임지는 프리미엄 화이트글러브 서비스.
+        </p>
+
+        <div class="flex flex-wrap gap-4" style="animation:fadeIn 1s 1.1s both; opacity:0;">
+          <a href="#contact" class="cta-btn" style="padding:14px 36px; font-size:0.72rem;">견적 문의하기</a>
+          <a href="#services" style="display:inline-flex; align-items:center; gap:8px; padding:14px 24px; color:var(--gold); font-family:'Noto Sans KR',sans-serif; font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase; text-decoration:none; border-bottom:1px solid transparent; transition:border-color 0.3s;" 
+             onmouseover="this.style.borderBottomColor='var(--gold)'" 
+             onmouseout="this.style.borderBottomColor='transparent'">
+            서비스 알아보기
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+
+        <!-- Stats row -->
+        <div class="flex gap-10 mt-16 pt-10" style="border-top:1px solid rgba(197,162,111,0.1); animation:fadeIn 1s 1.3s both; opacity:0;">
+          <div>
+            <div style="font-family:'Cormorant Garamond',serif; font-size:2.2rem; font-weight:300; color:var(--gold); line-height:1;">2인</div>
+            <div style="font-size:0.65rem; letter-spacing:0.15em; color:rgba(232,213,176,0.5); text-transform:uppercase; margin-top:4px;">전문 배송팀</div>
+          </div>
+          <div style="width:1px; background:rgba(197,162,111,0.15);"></div>
+          <div>
+            <div style="font-family:'Cormorant Garamond',serif; font-size:2.2rem; font-weight:300; color:var(--gold); line-height:1;">100%</div>
+            <div style="font-size:0.65rem; letter-spacing:0.15em; color:rgba(232,213,176,0.5); text-transform:uppercase; margin-top:4px;">완전 책임제</div>
+          </div>
+          <div style="width:1px; background:rgba(197,162,111,0.15);"></div>
+          <div>
+            <div style="font-family:'Cormorant Garamond',serif; font-size:2.2rem; font-weight:300; color:var(--gold); line-height:1;">VIP</div>
+            <div style="font-size:0.65rem; letter-spacing:0.15em; color:rgba(232,213,176,0.5); text-transform:uppercase; margin-top:4px;">전용 서비스</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Image Collage -->
+      <div class="hidden lg:block relative" style="height:580px;">
+        <!-- Main large image -->
+        <div class="gallery-img absolute" style="top:0; right:0; width:72%; height:75%; border:1px solid rgba(197,162,111,0.2);">
+          <img src="https://i.ibb.co/KTJRdsc/Kakao-Talk-Photo-2026-05-14-16-00-40-004.jpg" alt="바른운송 브랜드" loading="eager">
+          <div class="corner-tl"></div>
+          <div class="corner-tr"></div>
+        </div>
+        <!-- Small bottom left -->
+        <div class="gallery-img absolute" style="bottom:0; left:0; width:48%; height:48%; border:1px solid rgba(197,162,111,0.2);">
+          <img src="https://i.ibb.co/VYBMmHQJ/Kakao-Talk-Photo-2026-05-14-16-00-40-001.jpg" alt="바른운송 서비스">
+          <div class="corner-bl"></div>
+        </div>
+        <!-- Small center right -->
+        <div class="gallery-img absolute" style="bottom:4%; left:52%; width:44%; height:36%; border:1px solid rgba(197,162,111,0.2);">
+          <img src="https://i.ibb.co/KxNBZCsD/Kakao-Talk-Photo-2026-05-14-16-00-59-001.jpg" alt="바른운송 로고">
+          <div class="corner-br"></div>
+        </div>
+        <!-- Gold accent line -->
+        <div style="position:absolute; top:50%; left:-20px; width:1px; height:80px; background:linear-gradient(to bottom, transparent, var(--gold), transparent);"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2" style="animation: bounce 2s infinite 2s;">
+    <div style="font-size:0.55rem; letter-spacing:0.3em; color:rgba(197,162,111,0.5); text-transform:uppercase;">Scroll</div>
+    <div style="width:1px; height:40px; background:linear-gradient(to bottom, var(--gold), transparent);"></div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════
+     MARQUEE BAND
+═══════════════════════════════════════════ -->
+<div style="background:var(--gold); padding:14px 0; overflow:hidden; position:relative; z-index:2;">
+  <div class="marquee-track" style="color:var(--navy-900); font-family:'Noto Sans KR',sans-serif; font-size:0.65rem; letter-spacing:0.3em; text-transform:uppercase; font-weight:500;">
+    <span>White Glove Delivery</span>
+    <span>✦</span>
+    <span>프리미엄 배송 전문</span>
+    <span>✦</span>
+    <span>2인 1조 배송팀</span>
+    <span>✦</span>
+    <span>실내 배치 서비스</span>
+    <span>✦</span>
+    <span>포장재 완전 회수</span>
+    <span>✦</span>
+    <span>대형 가구 & 가전 전문</span>
+    <span>✦</span>
+    <span>아트워크 특수 운반</span>
+    <span>✦</span>
+    <span>VIP 고객 전용 서비스</span>
+    <span>✦</span>
+    <!-- Duplicate for infinite scroll -->
+    <span>White Glove Delivery</span>
+    <span>✦</span>
+    <span>프리미엄 배송 전문</span>
+    <span>✦</span>
+    <span>2인 1조 배송팀</span>
+    <span>✦</span>
+    <span>실내 배치 서비스</span>
+    <span>✦</span>
+    <span>포장재 완전 회수</span>
+    <span>✦</span>
+    <span>대형 가구 & 가전 전문</span>
+    <span>✦</span>
+    <span>아트워크 특수 운반</span>
+    <span>✦</span>
+    <span>VIP 고객 전용 서비스</span>
+    <span>✦</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     SERVICES
+═══════════════════════════════════════════ -->
+<section id="services" class="py-28 px-6 lg:px-12 section-alt">
+  <div class="max-w-7xl mx-auto">
+
+    <!-- Section Header -->
+    <div class="mb-20 reveal">
+      <div class="relative inline-block">
+        <span class="section-en">Services</span>
+        <div class="gold-badge mb-4">핵심 서비스</div>
+      </div>
+      <h2 style="font-family:'Noto Serif KR',serif; font-size:clamp(2rem,3.5vw,3rem); font-weight:300; color:#F0EAE0; margin-top:16px; margin-bottom:20px; letter-spacing:-0.01em;">
+        단순 배송을 넘어선<br>
+        <span style="color:var(--gold);">완전한 화이트글러브 경험</span>
+      </h2>
+      <p style="font-size:0.9rem; color:rgba(232,213,176,0.6); line-height:2; max-width:500px; font-weight:300;">
+        바른운송은 물건을 옮기는 것에서 그치지 않습니다. 고객의 공간에 맞게 배치하고, 흔적 없이 마무리합니다.
+      </p>
+    </div>
+
+    <!-- Service Grid -->
+    <div class="grid md:grid-cols-3 gap-6">
+
+      <!-- Service 1 -->
+      <div class="service-card p-8 reveal reveal-delay-1">
+        <div class="mb-6" style="width:48px; height:48px; border:1px solid rgba(197,162,111,0.3); display:flex; align-items:center; justify-content:center;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C5A26F" stroke-width="1.2">
+            <rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+          </svg>
+        </div>
+        <div style="font-size:0.6rem; letter-spacing:0.25em; color:var(--gold); text-transform:uppercase; font-family:'Noto Sans KR',sans-serif; margin-bottom:12px;">01 — Furniture</div>
+        <h3 style="font-family:'Noto Serif KR',serif; font-size:1.25rem; font-weight:400; color:#F0EAE0; margin-bottom:16px; letter-spacing:0.02em;">대형 가구 전문 배송</h3>
+        <div style="width:32px; height:1px; background:linear-gradient(90deg,var(--gold),transparent); margin-bottom:20px;"></div>
+        <p style="font-size:0.83rem; color:rgba(232,213,176,0.6); line-height:2; font-weight:300;">
+          소파, 침대, 붙박이 가구 등 대형 가구를 전문 트럭과 2인 팀이 층간 이동부터 실내 정위치 배치까지 완벽하게 처리합니다.
+        </p>
+        <div class="mt-8 pt-6" style="border-top:1px solid rgba(197,162,111,0.08);">
+          <ul style="font-size:0.75rem; color:rgba(197,162,111,0.7); display:flex; flex-direction:column; gap:8px; list-style:none;">
+            <li style="display:flex; align-items:center; gap:8px;"><span style="color:var(--gold);">—</span> 전문 포장재 사용</li>
+            <li style="display:flex; align-items:center; gap:8px;"><span style="color:var(--gold);">—</span> 실내 벽면·바닥 보양 처리</li>
+            <li style="display:flex; align-items:center; gap:8px;"><span style="color:var(--gold);">—</span> 조립·설치 서비스 포함</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Service 2 (Featured) -->
+      <div class="service-card p-8 reveal reveal-delay-2" style="border-color:rgba(197,162,111,0.25); background:linear-gradient(135deg, rgba(197,162,111,0.06) 0%, rgba(197,162,111,0.02) 100%); position:relative;">
+        <div style="position:absolute; top:0; left:50%; transform:translateX(-50%); background:var(--gold); color:var(--navy-900); font-size:0.55rem; letter-spacing:0.2em; padding:4px 16px; text-transform:uppercase; font-family:'Noto Sans KR',sans-serif; font-weight:500; white-space:nowrap;">대표 서비스</div>
+        <div class="mb-6 mt-4" style="width:48px; height:48px; border:1px solid rgba(197,162,111,0.5); display:flex; align-items:center; justify-content:center; background:rgba(197,162,111,0.08);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C5A26F" stroke-width="1.2">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+          </svg>
+        </div>
+        <div style="font-size:0.6rem; letter-spacing:0.25em; color:var(--gold); text-transform:uppercase; font-family:'Noto Sans KR',sans-serif; margin-bottom:12px;">02 — Appliance</div>
+        <h3 style="font-family:'Noto Serif KR',serif; font-size:1.25rem; font-weight:400; color:#F0EAE0; margin-bottom:16px; letter-spacing:0.02em;">프리미엄 가전 배송</h3>
+        <div style="width:32px; height:1px; background:linear-gradient(90deg,var(--gold),transparent); margin-bottom:20px;"></div>
+        <p style="font-size:0.83rem; color:rgba(232,213,176,0.6); line-height:2; font-weight:300;">
+          냉장고, TV, 세탁기 등 고급 가전제품을 충격 없이 운반합니다. 설치 위치 확인부터 포장재 회수까지 흔적 없는 서비스를 제공합니다.
+        </p>
+        <div class="mt-8 pt-6" style="border-top:1px solid rgba(197,162,111,0.15);">
+          <ul style="font-size:0.75rem; color:rgba(197,162,111,0.7); display:flex; flex-direction:column; gap:8px; list-style:none;">
+            <li style="display:flex; align-items:center; gap:8px;"><span style="color:var(--gold);">—</span> 충격 방지 특수 포장</li>
+            <li style="display:flex; align-items:center; gap:8px;"><span style="color:var(--gold);">—</span> 설치 보조 서비스</li>
+            <li style="display:flex; align-items:center; gap:8px;"><span style="color:var(--gold);">—</span> 포장재 즉시 회수</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Service 3 -->
+      <div class="service-card p-8 reveal reveal-delay-3">
+        <div class="mb-6" style="width:48px; height:48px; border:1px solid rgba(197,162,111,0.3); display:flex; align-items:center; justify-content:center;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C5A26F" stroke-width="1.2">
+            <rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9h18M9 21V9"/>
+          </svg>
+        </div>
+        <div style="font-size:0.6rem; letter-spacing:0.25em; color:var(--gold); text-transform:uppercase; font-family:'Noto Sans KR',sans-serif; margin-bottom:12px;">03 — Artwork</div>
+        <h3 style="font-family:'Noto Serif KR',serif; font-size:1.25rem; font-weight:400; color:#F0EAE0; margin-bottom:16px; letter-spacing:0.02em;">아트워크 특수 운반</h3>
+        <div style="width:32px; height:1px; background:linear-gradient(90deg,var(--gold),transparent); margin-bottom:20px;"></div>
+        <p style="font-size:0.83rem; color:rgba(232,213,176,0.6); line-height:2; font-weight:300;">
+          회화, 조각, 골동품 등 고가의 예술 작품을 위한 특수 운반 서비스. 전용 보호 포장과 섬세한 핸들링으로 원형을 완벽하게 보존합니다.
+        </p>
+        <div class="mt-8 pt-6" style="border-top:1px solid rgba(197,162,111,0.08);">
+          <ul style="font-size:0.75rem; color:rgba(197,162,111,0.7); display:flex; flex-direction:column; gap:8px; list-style:none;">
+            <li style="display:flex; align-items:center; gap:8px;"><span style="color:var(--gold);">—</span> 아트워크 전용 포장재</li>
+            <li style="display:flex; align-items:center; gap:8px;"><span style="color:var(--gold);">—</span> 온도·습도 주의 운반</li>
+            <li style="display:flex; align-items:center; gap:8px;"><span style="color:var(--gold);">—</span> 지정 위치 정확 배치</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Full-width image band -->
+    <div class="mt-16 grid grid-cols-3 gap-3 reveal" style="height:200px;">
+      <div class="gallery-img col-span-2" style="border:1px solid rgba(197,162,111,0.15);">
+        <img src="https://i.ibb.co/LdJhk07P/Kakao-Talk-Photo-2026-05-14-16-00-40-003.jpg" alt="바른운송 서비스" style="height:100%;">
+      </div>
+      <div class="gallery-img" style="border:1px solid rgba(197,162,111,0.15);">
+        <img src="https://i.ibb.co/GQ6Xcx8x/Kakao-Talk-Photo-2026-05-14-16-00-40-002.jpg" alt="바른운송 브랜드" style="height:100%;">
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════
+     WHY BAREUNSONG
+═══════════════════════════════════════════ -->
+<section id="why" class="py-28 px-6 lg:px-12" style="background:var(--navy-950);">
+  <div class="max-w-7xl mx-auto">
+
+    <div class="grid lg:grid-cols-2 gap-16 items-center">
+
+      <!-- Left: Image -->
+      <div class="relative reveal">
+        <div class="gallery-img" style="height:520px; border:1px solid rgba(197,162,111,0.2);">
+          <img src="https://i.ibb.co/wrsskj2B/Kakao-Talk-Photo-2026-05-14-16-00-59-002.jpg" alt="바른운송" style="height:100%;">
+          <div class="corner-tl"></div>
+          <div class="corner-br"></div>
+        </div>
+        <!-- Floating accent box -->
+        <div class="absolute -bottom-6 -right-6 p-6 hidden lg:block" style="background:var(--gold); width:160px;">
+          <div style="font-family:'Cormorant Garamond',serif; font-size:3rem; font-weight:300; color:var(--navy-900); line-height:1;">VIP</div>
+          <div style="font-size:0.6rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--navy-900); font-family:'Noto Sans KR',sans-serif; margin-top:4px; font-weight:500;">전용 서비스</div>
+        </div>
+        <!-- Vertical text -->
+        <div class="absolute -left-10 top-1/2 -translate-y-1/2 hidden lg:block" style="writing-mode:vertical-rl; font-family:'Cormorant Garamond',serif; font-size:0.75rem; letter-spacing:0.3em; color:rgba(197,162,111,0.4); text-transform:uppercase;">Premium Delivery</div>
+      </div>
+
+      <!-- Right: Content -->
+      <div class="reveal reveal-delay-2">
+        <div class="relative mb-8">
+          <span class="section-en" style="font-size:clamp(3rem,5vw,4.5rem); top:-8px;">Why Us</span>
+          <div class="gold-badge mb-4">왜 바른운송인가</div>
+        </div>
+
+        <h2 style="font-family:'Noto Serif KR',serif; font-size:clamp(1.8rem,3vw,2.5rem); font-weight:300; color:#F0EAE0; margin-bottom:16px; letter-spacing:-0.01em;">
+          진짜 프리미엄은<br>
+          <span style="color:var(--gold);">디테일에서 결정됩니다</span>
+        </h2>
+        <p style="font-size:0.85rem; color:rgba(232,213,176,0.6); line-height:2; font-weight:300; margin-bottom:40px;">
+          바른운송은 단순히 물건을 운반하는 회사가 아닙니다. 고객의 시간과 공간, 그리고 소중한 물건을 존중하는 태도로 매 서비스에 임합니다.
+        </p>
+
+        <!-- Differentiators -->
+        <div style="display:flex; flex-direction:column; gap:24px;">
+
+          <div class="diff-item">
+            <h4 style="font-family:'Noto Serif KR',serif; font-size:1rem; font-weight:500; color:#F0EAE0; margin-bottom:8px;">2인 1조 전문 배송팀</h4>
+            <p style="font-size:0.8rem; color:rgba(232,213,176,0.55); line-height:1.8; font-weight:300;">혼자서는 불가능한 대형 품목도 숙련된 2인 팀이 호흡을 맞춰 안전하게 배송합니다. 층간 이동, 좁은 공간도 문제없습니다.</p>
+          </div>
+
+          <div class="diff-item">
+            <h4 style="font-family:'Noto Serif KR',serif; font-size:1rem; font-weight:500; color:#F0EAE0; margin-bottom:8px;">실내 완벽 보양 후 작업</h4>
+            <p style="font-size:0.8rem; color:rgba(232,213,176,0.55); line-height:1.8; font-weight:300;">복도, 벽면, 바닥에 전문 보양재를 설치하고 배송합니다. 새 집처럼 깨끗하게 시작한 공간을 그 상태로 유지합니다.</p>
+          </div>
+
+          <div class="diff-item">
+            <h4 style="font-family:'Noto Serif KR',serif; font-size:1rem; font-weight:500; color:#F0EAE0; margin-bottom:8px;">포장재 전량 회수</h4>
+            <p style="font-size:0.8rem; color:rgba(232,213,176,0.55); line-height:1.8; font-weight:300;">배송 완료 후 모든 포장 박스, 에어캡, 완충재를 즉시 수거해 갑니다. 쓰레기 처리 걱정 없이 새 물건만 남습니다.</p>
+          </div>
+
+          <div class="diff-item">
+            <h4 style="font-family:'Noto Serif KR',serif; font-size:1rem; font-weight:500; color:#F0EAE0; margin-bottom:8px;">정시 도착, 정확한 배치</h4>
+            <p style="font-size:0.8rem; color:rgba(232,213,176,0.55); line-height:1.8; font-weight:300;">고객이 원하는 위치에 정확히 배치합니다. 약속된 시간을 철저히 지키고, 배치 후 만족 여부를 직접 확인합니다.</p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════
+     PROCESS
+═══════════════════════════════════════════ -->
+<section id="process" class="py-28 px-6 lg:px-12 section-alt">
+  <div class="max-w-7xl mx-auto">
+
+    <!-- Header -->
+    <div class="text-center mb-20 reveal">
+      <div class="relative inline-block">
+        <div class="gold-badge mb-4">이용 방법</div>
+      </div>
+      <h2 style="font-family:'Noto Serif KR',serif; font-size:clamp(2rem,3.5vw,3rem); font-weight:300; color:#F0EAE0; margin-top:16px; margin-bottom:16px; letter-spacing:-0.01em;">
+        간단한 <span style="color:var(--gold);">4단계</span>로 시작하세요
+      </h2>
+      <p style="font-size:0.85rem; color:rgba(232,213,176,0.55); font-weight:300;">문의부터 배송 완료까지, 바른운송이 모든 과정을 책임집니다.</p>
+    </div>
+
+    <!-- Steps -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-0">
+
+      <!-- Step 1 -->
+      <div class="relative reveal reveal-delay-1 p-8" style="border:1px solid rgba(197,162,111,0.1); border-right:none;">
+        <div class="step-number">01</div>
+        <div style="width:1px; height:32px; background:linear-gradient(to bottom, var(--gold), transparent); margin:16px 0;"></div>
+        <h3 style="font-family:'Noto Serif KR',serif; font-size:1.05rem; font-weight:500; color:#F0EAE0; margin-bottom:12px;">문의 & 상담</h3>
+        <p style="font-size:0.78rem; color:rgba(232,213,176,0.55); line-height:1.9; font-weight:300;">전화 또는 온라인 양식으로 품목, 출발지·도착지, 희망 날짜를 알려주세요.</p>
+        <!-- Arrow -->
+        <div class="hidden lg:block absolute right-0 top-1/2 translate-x-1/2 z-10" style="width:12px; height:12px; border-top:1px solid var(--gold); border-right:1px solid var(--gold); transform:translateY(-50%) rotate(45deg);"></div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="relative reveal reveal-delay-2 p-8" style="border:1px solid rgba(197,162,111,0.1); border-right:none;">
+        <div class="step-number">02</div>
+        <div style="width:1px; height:32px; background:linear-gradient(to bottom, var(--gold), transparent); margin:16px 0;"></div>
+        <h3 style="font-family:'Noto Serif KR',serif; font-size:1.05rem; font-weight:500; color:#F0EAE0; margin-bottom:12px;">견적 확정</h3>
+        <p style="font-size:0.78rem; color:rgba(232,213,176,0.55); line-height:1.9; font-weight:300;">품목과 거리에 따라 명확한 견적을 제공합니다. 숨겨진 비용 없이 투명하게 안내드립니다.</p>
+        <div class="hidden lg:block absolute right-0 top-1/2 translate-x-1/2 z-10" style="width:12px; height:12px; border-top:1px solid var(--gold); border-right:1px solid var(--gold); transform:translateY(-50%) rotate(45deg);"></div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="relative reveal reveal-delay-3 p-8" style="border:1px solid rgba(197,162,111,0.1); border-right:none;">
+        <div class="step-number">03</div>
+        <div style="width:1px; height:32px; background:linear-gradient(to bottom, var(--gold), transparent); margin:16px 0;"></div>
+        <h3 style="font-family:'Noto Serif KR',serif; font-size:1.05rem; font-weight:500; color:#F0EAE0; margin-bottom:12px;">전문팀 방문</h3>
+        <p style="font-size:0.78rem; color:rgba(232,213,176,0.55); line-height:1.9; font-weight:300;">약속된 시간에 2인 전문팀이 전용 트럭과 보양재, 포장재를 갖추고 방문합니다.</p>
+        <div class="hidden lg:block absolute right-0 top-1/2 translate-x-1/2 z-10" style="width:12px; height:12px; border-top:1px solid var(--gold); border-right:1px solid var(--gold); transform:translateY(-50%) rotate(45deg);"></div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="relative reveal reveal-delay-4 p-8" style="border:1px solid rgba(197,162,111,0.1);">
+        <div class="step-number" style="background:linear-gradient(180deg, rgba(197,162,111,0.7) 0%, rgba(197,162,111,0.1) 100%); -webkit-background-clip:text; background-clip:text;">04</div>
+        <div style="width:1px; height:32px; background:linear-gradient(to bottom, var(--gold), transparent); margin:16px 0;"></div>
+        <h3 style="font-family:'Noto Serif KR',serif; font-size:1.05rem; font-weight:500; color:#F0EAE0; margin-bottom:12px;">완료 & 회수</h3>
+        <p style="font-size:0.78rem; color:rgba(232,213,176,0.55); line-height:1.9; font-weight:300;">정위치 배치 후 포장재를 전량 회수합니다. 고객 만족 확인 후 서비스가 완료됩니다.</p>
+      </div>
+
+    </div>
+
+    <!-- CTA Block -->
+    <div class="mt-16 p-10 text-center reveal" style="background:linear-gradient(135deg, rgba(197,162,111,0.08) 0%, rgba(197,162,111,0.03) 100%); border:1px solid rgba(197,162,111,0.15); position:relative; overflow:hidden;">
+      <div style="position:absolute; top:-40px; right:-40px; width:200px; height:200px; border-radius:50%; background:radial-gradient(circle, rgba(197,162,111,0.06) 0%, transparent 70%);"></div>
+      <p style="font-family:'Noto Serif KR',serif; font-size:clamp(1.2rem,2vw,1.6rem); font-weight:300; color:#F0EAE0; margin-bottom:20px; letter-spacing:0.02em;">
+        지금 바로 <span style="color:var(--gold);">견적을 문의</span>해보세요
+      </p>
+      <a href="#contact" class="cta-btn" style="padding:14px 48px;">무료 견적 받기</a>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════
+     CONTACT
+═══════════════════════════════════════════ -->
+<section id="contact" class="py-28 px-6 lg:px-12" style="background:var(--navy-950);">
+  <div class="max-w-7xl mx-auto">
+
+    <!-- Header -->
+    <div class="mb-16 reveal">
+      <div class="gold-badge mb-4">문의하기</div>
+      <h2 style="font-family:'Noto Serif KR',serif; font-size:clamp(2rem,3.5vw,3rem); font-weight:300; color:#F0EAE0; margin-top:16px; letter-spacing:-0.01em;">
+        바른운송에<br>
+        <span style="color:var(--gold);">직접 연락하세요</span>
+      </h2>
+    </div>
+
+    <div class="grid lg:grid-cols-5 gap-12">
+
+      <!-- Left: Info (2/5) -->
+      <div class="lg:col-span-2 reveal">
+
+        <!-- Phone -->
+        <div class="mb-10">
+          <div class="form-label" style="margin-bottom:12px;">전화 문의</div>
+          <a href="tel:01088247774" class="phone-display">010-8824-7774</a>
+          <p style="font-size:0.75rem; color:rgba(232,213,176,0.45); margin-top:8px; font-weight:300;">전화 연결이 어려우실 경우 문자 남겨주시면<br>빠르게 연락드립니다.</p>
+        </div>
+
+        <div style="width:100%; height:1px; background:linear-gradient(90deg, rgba(197,162,111,0.2), transparent); margin-bottom:32px;"></div>
+
+        <!-- Company Info -->
+        <div class="contact-info-box p-6">
+          <div class="corner-tl" style="width:14px; height:14px;"></div>
+          <div class="corner-br" style="width:14px; height:14px;"></div>
+          <div style="display:flex; flex-direction:column; gap:14px; padding-top:8px;">
+            <div>
+              <div class="form-label" style="margin-bottom:4px;">회사명</div>
+              <div style="font-family:'Noto Serif KR',serif; font-size:1rem; color:#E8D5B0;">바른운송</div>
+            </div>
+            <div>
+              <div class="form-label" style="margin-bottom:4px;">대표자</div>
+              <div style="font-size:0.85rem; color:rgba(232,213,176,0.7);">홍성민</div>
+            </div>
+            <div>
+              <div class="form-label" style="margin-bottom:4px;">사업자등록번호</div>
+              <div style="font-size:0.85rem; color:rgba(232,213,176,0.7);">208-14-54956</div>
+            </div>
+            <div>
+              <div class="form-label" style="margin-bottom:4px;">서비스 지역</div>
+              <div style="font-size:0.85rem; color:rgba(232,213,176,0.7);">전국 배송 가능</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slogan -->
+        <div class="mt-8">
+          <div style="font-family:'Cormorant Garamond',serif; font-size:1.4rem; font-weight:300; font-style:italic; color:rgba(197,162,111,0.6); letter-spacing:0.05em;">"바르게, 조용히, 정확하게."</div>
+        </div>
+
+      </div>
+
+      <!-- Right: Form (3/5) -->
+      <div class="lg:col-span-3 reveal reveal-delay-2">
+        <form id="contact-form" onsubmit="handleSubmit(event)">
+          <div class="grid md:grid-cols-2 gap-6 mb-6">
+            <div>
+              <label class="form-label">이름 *</label>
+              <input type="text" class="form-input" placeholder="홍길동" required>
+            </div>
+            <div>
+              <label class="form-label">연락처 *</label>
+              <input type="tel" class="form-input" placeholder="010-0000-0000" required>
+            </div>
+          </div>
+
+          <div class="mb-6">
+            <label class="form-label">이메일</label>
+            <input type="email" class="form-input" placeholder="example@email.com">
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-6 mb-6">
+            <div>
+              <label class="form-label">배송 품목 *</label>
+              <select class="form-input" required style="appearance:none; cursor:pointer;">
+                <option value="" style="background:var(--navy-900);">품목 선택</option>
+                <option style="background:var(--navy-900);">대형 가구</option>
+                <option style="background:var(--navy-900);">프리미엄 가전</option>
+                <option style="background:var(--navy-900);">아트워크</option>
+                <option style="background:var(--navy-900);">기타 대형 품목</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label">희망 배송일</label>
+              <input type="date" class="form-input" style="color-scheme:dark;">
+            </div>
+          </div>
+
+          <div class="mb-6">
+            <label class="form-label">상세 문의 내용</label>
+            <textarea class="form-input" rows="5" placeholder="배송 품목, 출발지·도착지, 층수, 특이사항 등을 자유롭게 작성해주세요." style="resize:vertical; min-height:120px;"></textarea>
+          </div>
+
+          <button type="submit" class="submit-btn">문의 보내기</button>
+
+          <div id="form-success" class="mt-4">
+            ✦ 문의가 접수되었습니다. 빠른 시일 내 연락드리겠습니다.
+          </div>
+
+          <p style="font-size:0.65rem; color:rgba(232,213,176,0.3); margin-top:16px; text-align:center; letter-spacing:0.05em;">
+            입력하신 정보는 서비스 문의 목적으로만 사용됩니다.
+          </p>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════ -->
+<footer style="background:var(--navy-950); border-top:1px solid rgba(197,162,111,0.12);">
+
+  <!-- Top: Logo + Nav -->
+  <div class="max-w-7xl mx-auto px-6 lg:px-12 py-16">
+    <div class="grid lg:grid-cols-3 gap-12">
+
+      <!-- Brand -->
+      <div class="lg:col-span-1">
+        <div class="flex items-center gap-3 mb-6">
+          <div style="width:44px; height:44px; overflow:hidden; border:1px solid rgba(197,162,111,0.25);">
+            <img src="https://i.ibb.co/wrsskj2B/Kakao-Talk-Photo-2026-05-14-16-00-59-002.jpg" alt="바른운송" style="width:100%; height:100%; object-fit:cover;">
+          </div>
+          <div>
+            <div style="font-family:'Noto Serif KR',serif; font-size:1.1rem; font-weight:500; color:#E8D5B0; letter-spacing:0.1em;">바른운송</div>
+            <div style="font-size:0.5rem; letter-spacing:0.25em; color:var(--gold); text-transform:uppercase;">Premium Delivery</div>
+          </div>
+        </div>
+        <p style="font-size:0.78rem; color:rgba(232,213,176,0.45); line-height:2; font-weight:300; max-width:280px;">
+          대형 가구·가전·아트워크 전문<br>화이트글러브 배송 서비스.<br>바르게, 조용히, 정확하게.
+        </p>
+        <div style="margin-top:24px; font-family:'Cormorant Garamond',serif; font-size:1.2rem; font-weight:300; font-style:italic; color:rgba(197,162,111,0.4);">"바르게, 조용히, 정확하게."</div>
+      </div>
+
+      <!-- Links -->
+      <div>
+        <div class="form-label" style="margin-bottom:16px;">서비스</div>
+        <ul style="display:flex; flex-direction:column; gap:10px; list-style:none;">
+          <li><a href="#services" style="font-size:0.8rem; color:rgba(232,213,176,0.5); text-decoration:none; transition:color 0.3s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='rgba(232,213,176,0.5)'">대형 가구 배송</a></li>
+          <li><a href="#services" style="font-size:0.8rem; color:rgba(232,213,176,0.5); text-decoration:none; transition:color 0.3s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='rgba(232,213,176,0.5)'">프리미엄 가전 배송</a></li>
+          <li><a href="#services" style="font-size:0.8rem; color:rgba(232,213,176,0.5); text-decoration:none; transition:color 0.3s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='rgba(232,213,176,0.5)'">아트워크 특수 운반</a></li>
+          <li><a href="#process" style="font-size:0.8rem; color:rgba(232,213,176,0.5); text-decoration:none; transition:color 0.3s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='rgba(232,213,176,0.5)'">이용 방법</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact -->
+      <div>
+        <div class="form-label" style="margin-bottom:16px;">연락처</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C5A26F" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.46 2 2 0 0 1 3.59 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.56a16 16 0 0 0 6.29 6.29l.93-.93a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <a href="tel:01088247774" style="font-size:0.85rem; color:rgba(232,213,176,0.7); text-decoration:none; transition:color 0.3s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='rgba(232,213,176,0.7)'">010-8824-7774</a>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C5A26F" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span style="font-size:0.85rem; color:rgba(232,213,176,0.55);">대표 홍성민</span>
+          </div>
+          <div style="display:flex; align-items:flex-start; gap:10px; margin-top:4px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C5A26F" stroke-width="1.5" style="flex-shrink:0; margin-top:2px;"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            <span style="font-size:0.78rem; color:rgba(232,213,176,0.4);">사업자등록번호<br>208-14-54956</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bottom bar -->
+  <div style="border-top:1px solid rgba(197,162,111,0.08); padding:20px 24px;">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+      <p style="font-size:0.65rem; color:rgba(232,213,176,0.3); letter-spacing:0.08em;">© 2026 바른운송. All rights reserved.</p>
+      <div class="gold-line" style="margin:0;"></div>
+      <p style="font-size:0.65rem; color:rgba(197,162,111,0.4); letter-spacing:0.1em; text-transform:uppercase; font-family:'Cormorant Garamond',serif; font-style:italic;">Bareunsong Premium Delivery</p>
+    </div>
+  </div>
+
+</footer>
+
+
+<!-- ═══════════════════════════════════════════
+     SCRIPTS
+═══════════════════════════════════════════ -->
+<script>
+  /* ── NAV SCROLL ── */
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 60) {
+      navbar.classList.add('scrolled');
+    } else {
+      navbar.classList.remove('scrolled');
+    }
+  });
+
+  /* ── MOBILE MENU ── */
+  function toggleMenu() {
+    const menu = document.getElementById('mobile-menu');
+    menu.classList.toggle('open');
+    document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+  }
+
+  /* ── SCROLL REVEAL ── */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  /* ── HERO GLOW PARALLAX ── */
+  document.addEventListener('mousemove', (e) => {
+    const glows = document.querySelectorAll('.hero-glow');
+    const x = (e.clientX / window.innerWidth - 0.5) * 30;
+    const y = (e.clientY / window.innerHeight - 0.5) * 30;
+    glows.forEach((g, i) => {
+      const factor = i === 0 ? 1 : -0.6;
+      g.style.transform = `translate(${x * factor}px, ${y * factor}px)`;
+    });
+  });
+
+  /* ── FORM SUBMIT ── */
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('.submit-btn');
+    const success = document.getElementById('form-success');
+    btn.textContent = '전송 중...';
+    btn.style.opacity = '0.7';
+    setTimeout(() => {
+      btn.style.display = 'none';
+      success.style.display = 'block';
+      e.target.reset();
+    }, 1200);
+  }
+
+  /* ── SMOOTH SCROLL ── */
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  /* ── FADE IN KEYFRAME ── */
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes expandWidth {
+      from { width: 0; }
+      to { width: 40px; }
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(8px); }
+    }
+  `;
+  document.head.appendChild(style);
+</script>
+
+</body>
+</html>
